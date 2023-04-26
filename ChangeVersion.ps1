@@ -1,16 +1,27 @@
-﻿# Universal tool to change assembly and file version in Visual studio projects. Support net framework AssemblyInfo file and new .NET
+# Universal tool to change assembly and file version in Visual studio projects. Support net framework AssemblyInfo file and new .NET
 
 Write-Host "Change project version"
 Write-Host "----------------------"
 
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
-$files = Get-Childitem -Path $dir -Exclude *UnitTest* -Include *.csproj, AssemblyInfo.cs -File -Recurse | %{ $_.FullName }
-$newProjectVersion = Read-Host "Enter new version "
+$files = Get-Childitem -Path $dir -Include *.csproj, AssemblyInfo.cs -File -Recurse | %{ $_.FullName }
+$newProjectVersion = Read-Host "Enter new version in format x.x.x.x"
+[string[]]$skipProjects ="*UnitTest*", "*Test*"
 
 foreach ($item in $files)
 {
-    if($item -like "*UnitTest*")
+    [bool]$isSkip = 0;
+    
+    foreach($skipProject in $skipProjects)
+    {
+        if($item -like $skipProject)
+        {
+            $isSkip = 1;
+        }   
+    }
+
+    if($isSkip)
     {
         continue;
     }
@@ -26,6 +37,8 @@ foreach ($item in $files)
             $fileVerElement.InnerText=$newProjectVersion
             $assemblyVerElement.InnerText = $newProjectVersion
             $xmlData.Save($item)
+
+            Write-Host $item
         }
     }
     else
@@ -33,5 +46,7 @@ foreach ($item in $files)
         [string]$ai = Get-Content $item -Raw
         $newAi = $ai -replace '"\d+\.\d+\.\d+\.\d+"', -join('"' , $newProjectVersion , '"')
         $newAi | Set-Content -Path $item
+
+        Write-Host $item
     }
 }
