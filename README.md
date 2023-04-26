@@ -1,7 +1,7 @@
 # Change Version Script
 Powershell script to change assembly and file version in all Visual Studio projects.
 
-Script foreach folders and search AssemblyInfo files or csproj files and change versions. The script ignore projects with name contains "UnitTest". 
+Script foreach folders and search AssemblyInfo files or csproj files and change versions. The script can skip projects, for example with name contains "*UnitTest*". 
 
 # Using
 - Copy script to root folder in your Visual studio project
